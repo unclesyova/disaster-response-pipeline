@@ -57,6 +57,12 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    """Save the dataframe as a sql table into specified database file
+
+    Keyword arguments:
+    df -- a dataframe
+    database_filename -- a database file to save the dataframe into
+    """
     engine = create_engine('sqlite:///'+database_filename)
     df.to_sql('message_category', engine, index=False)
 
