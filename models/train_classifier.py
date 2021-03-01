@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 import re
+from joblib import dump
 from nltk.tokenize import word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.metrics import classification_report
@@ -87,17 +88,26 @@ def build_model():
     # Perform grid search
     parameters = {
         'vect__ngram_range': ((1, 1), (1, 2)),
-        #'vect__max_df': (0.5, 0.75, 1.0),
-        #'vect__max_features': (None, 5000, 10000),
-        #'tfidf__use_idf': (True, False),
+        'vect__max_df': (0.5, 0.75, 1.0),
+        'vect__max_features': (None, 5000, 10000),
+        'tfidf__use_idf': (True, False),
     }
 
     cv = GridSearchCV(pipeline, param_grid=parameters)
 
-    return pipeline 
+    return cv 
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """Make prediction on X_test and 
+    evaluate every predicted field with classification report
+    
+    Keyword arguments:
+    model -- ML model for prediction
+    X_test -- test set of messages
+    Y_test -- categories corresponiding to X_test
+    category_names -- the names of categories
+    """
     Y_pred = model.predict(X_test)
     Y_pred = pd.DataFrame(Y_pred, columns=Y_test.columns, index=Y_test.index)
 
@@ -107,7 +117,15 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
-    pass
+    """Save the obtained model as a joblib file
+
+    Keyword arguments:
+    model -- ML model
+    model_filepath -- the filepath to save the model
+    """
+    dump(model, model_filepath)
+
+
 
 
 def main():
