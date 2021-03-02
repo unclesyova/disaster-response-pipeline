@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV
 import sys
@@ -82,7 +82,7 @@ def build_model():
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier(KNeighborsClassifier())),
+        ('clf', MultiOutputClassifier(DecisionTreeClassifier(max_depth=8))),
     ]) 
 
     # Perform grid search
@@ -123,7 +123,7 @@ def save_model(model, model_filepath):
     model -- ML model
     model_filepath -- the filepath to save the model
     """
-    dump(model, model_filepath)
+    dump(model, model_filepath, compress=9)
 
 
 
