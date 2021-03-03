@@ -30,7 +30,7 @@ engine = create_engine('sqlite:///../data/Classification.db')
 df = pd.read_sql_table('message_category', engine)
 
 # load model
-model = joblib.load("../models/your_model_name.pkl")
+model = joblib.load("../models/model.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
