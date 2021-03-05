@@ -11,6 +11,7 @@ from joblib import dump
 from nltk.tokenize import word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 from sklearn.metrics import classification_report
+from sklearn.metrics import precision_score 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -98,9 +99,10 @@ def build_model():
     return cv 
 
 
-def evaluate_model(model, X_test, Y_test, category_names):
+def evaluate_model(model, X_test, Y_test, category_names, database_filepath):
     """Make prediction on X_test and 
-    evaluate every predicted field with classification report
+    evaluate every predicted field with classification report.
+    Also save the precision scores for every category into sql table.
     
     Keyword arguments:
     model -- ML model for prediction
@@ -111,9 +113,18 @@ def evaluate_model(model, X_test, Y_test, category_names):
     Y_pred = model.predict(X_test)
     Y_pred = pd.DataFrame(Y_pred, columns=Y_test.columns, index=Y_test.index)
 
-    for col1, col2 in zip(Y_test.columns, Y_pred.columns):
-        print(col1+':')
-        print(classification_report(Y_test[col1], Y_pred[col2]))
+    precisions = []
+
+    for category in category_names: 
+        print(category+':')
+        print(classification_report(Y_test[category], Y_pred[category]))
+        prec = precision_score(Y_test[category], Y_pred[category], average='weighted')
+        precisions.append(prec)
+    prec_series = pd.Series(precisions, index=category_names)
+
+    engine = create_engine('sqlite:///' + database_filepath)
+    prec_series.to_sql('weighted_precision', engine)
+
 
 
 def save_model(model, model_filepath):
@@ -142,7 +153,7 @@ def main():
         model.fit(X_train, Y_train)
         
         print('Evaluating model...')
-        evaluate_model(model, X_test, Y_test, category_names)
+        evaluate_model(model, X_test, Y_test, category_names, database_filepath)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
         save_model(model, model_filepath)
