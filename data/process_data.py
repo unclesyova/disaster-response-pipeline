@@ -52,6 +52,9 @@ def clean_data(df):
     # drop duplicates
     df = df.drop_duplicates()
 
+    # drop invalid values in `related` column
+    df = df[df['related'] != 2]
+
     return df
 
 
