@@ -17,8 +17,14 @@ and being able to report them to corresponding organizations.
 * models/model.pkl -- trained ML model for categorizing messages
 
 ### How to use
-- Download the files listed above
-- Run run.py
+Download the files listed above  
+To process new data use process_data.py script as it is shown below:  
+process_data.py <new_messages.csv> <new_categories.csv> Classification.db  
+  
+To train a new ML model use train_classifier.py script as it is shown below:  
+train_classifier.py ../data/Classification.db model.pkl
+
+To run the web application use run.py
 
 ### 3rd party libraries
 The datasets are handeled with numpy(1.19.5) and pandas(0.22.0) libraries.  
